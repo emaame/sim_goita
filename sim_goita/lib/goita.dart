@@ -83,14 +83,14 @@ typedef bool CondTypeFunc(int n);
 CondTypeFunc genLess(_n) { return (n) => n < _n; }
 CondTypeFunc genLessThan(_n) { return (n) => n <= _n; }
 CondTypeFunc genEqual(_n) { return (n) => n == _n; }
-CondTypeFunc genMore(_n) { return (n) => n > _n; }
 CondTypeFunc genMoreThan(_n) { return (n) => n >= _n; }
+CondTypeFunc genMore(_n) { return (n) => n > _n; }
 const Map<CondType, CondTypeFuncGenerator> CondTypeFuncGenerators = {
   CondType.LESS: genLess,
   CondType.LESS_THAN: genLessThan,
   CondType.EQUAL: genEqual,
-  CondType.MORE_THAN: genMore,
-  CondType.MORE: genMoreThan,
+  CondType.MORE_THAN: genMoreThan,
+  CondType.MORE: genMore,
 };
 
 typedef List<Koma> CondTargetFunc(Game game);

@@ -1,0 +1,31 @@
+[debug] [2019-06-03T15:44:07.596Z] ----------------------------------------------------------------------
+[debug] [2019-06-03T15:44:07.598Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\ema\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2019-06-03T15:44:07.598Z] CLI Version:   6.10.0
+[debug] [2019-06-03T15:44:07.598Z] Platform:      win32
+[debug] [2019-06-03T15:44:07.598Z] Node Version:  v10.15.3
+[debug] [2019-06-03T15:44:07.599Z] Time:          Tue Jun 04 2019 00:44:07 GMT+0900 (GMT+09:00)
+[debug] [2019-06-03T15:44:07.599Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2019-06-03T15:44:07.605Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2019-06-03T15:44:07.606Z] > authorizing via signed-in user
+[debug] [2019-06-03T15:44:07.606Z] [iam] checking project sim-goita for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2019-06-03T15:44:07.607Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/sim-goita:testIamPermissions  
+
+[debug] [2019-06-03T15:44:08.342Z] <<< HTTP RESPONSE 200
+[debug] [2019-06-03T15:44:08.343Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/sim-goita  
+ 
+[debug] [2019-06-03T15:44:09.049Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Deploying to 'sim-goita'...
+[info] 
+[info] i  deploying hosting
+[debug] [2019-06-03T15:44:09.052Z] >>> HTTP REQUEST POST https://firebasehosting.googleapis.com/v1beta1/sites/sim-goita/versions  
+
+[debug] [2019-06-03T15:44:10.560Z] <<< HTTP RESPONSE 200
+[info] i  hosting[sim-goita]: beginning deploy...
+[info] i  hosting[sim-goita]: found 294 files in build
+[debug] [2019-06-03T15:44:10.611Z] [hosting] hash cache [YnVpbGQ] load error: lines is not defined
+[debug] [2019-06-03T15:44:13.648Z] [hosting] hash cache [YnVpbGQ] stored for 294 files
+[debug] [2019-06-03T15:44:13.649Z] [hosting][hash queue][FINAL]
+[debug] [2019-06-03T15:44:13.649Z] >>> HTTP REQUEST POST https://firebasehosting.googleapis.com/v1beta1/sites/sim-goita/versions/c1cca75b157b9c8f:populateFiles  
+ <request body omitted>

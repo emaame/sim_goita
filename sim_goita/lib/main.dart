@@ -181,8 +181,10 @@ class RandomGoitaState extends State<RandomGoita> {
               setState(() {
                 _passed = results;
                 _sample = _passed[0];
+
+                final percent = 100.0 * _passed.length / trials;
                 _resultText =
-                    "${_passed.length} passed / tried ${trials} (${time.inSeconds} sec.)";
+                    "${percent.toStringAsFixed(4)}% -- ${_passed.length} passed / tried $trials (${time.inSeconds} sec.)";
               });
             },
             child: Text(
