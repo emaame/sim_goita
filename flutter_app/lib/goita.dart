@@ -46,7 +46,7 @@ final initYama = List.filled(10, Koma.SHI) +
     List.filled(2, Koma.OU);
 
 class Game {
-  List yama;
+  List<Koma> yama;
   Game() {
     yama = List.from(initYama);
     yama.shuffle(); // destructive
@@ -93,14 +93,14 @@ const Map<CondType, CondTypeFuncGenerator> CondTypeFuncGenerators = {
   CondType.MORE: genMoreThan,
 };
 
-typedef List<dynamic> CondTargetFunc(Game game);
-List<dynamic> getP1(Game game) { return game.yama.sublist( 0,  8); }
-List<dynamic> getP2(Game game) { return game.yama.sublist( 8, 16); }
-List<dynamic> getP3(Game game) { return game.yama.sublist(16, 24); }
-List<dynamic> getP4(Game game) { return game.yama.sublist(24, 32); }
-List<dynamic> getPAIRFRIEND(Game game) { return game.yama.sublist(0,  8) + game.yama.sublist(16, 24); }
-List<dynamic> getPAIRENEMY(Game game)  { return game.yama.sublist(8, 16) + game.yama.sublist(24, 32); }
-List<dynamic> getWHOLE(Game game)  { return game.yama; }
+typedef List<Koma> CondTargetFunc(Game game);
+List<Koma> getP1(Game game) { return game.yama.sublist( 0,  8); }
+List<Koma> getP2(Game game) { return game.yama.sublist( 8, 16); }
+List<Koma> getP3(Game game) { return game.yama.sublist(16, 24); }
+List<Koma> getP4(Game game) { return game.yama.sublist(24, 32); }
+List<Koma> getPAIRFRIEND(Game game) { return game.yama.sublist(0,  8) + game.yama.sublist(16, 24); }
+List<Koma> getPAIRENEMY(Game game)  { return game.yama.sublist(8, 16) + game.yama.sublist(24, 32); }
+List<Koma> getWHOLE(Game game)  { return game.yama; }
 const Map<CondTarget, CondTargetFunc> CondTargetFuncs = {
   CondTarget.P1: getP1,
   CondTarget.P2: getP2,
