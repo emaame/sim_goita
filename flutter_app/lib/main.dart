@@ -36,6 +36,9 @@ class RandomGoitaState extends State<RandomGoita> {
 
   var game = Game();
   List<Filter> _filters = [];
+  List<Game> _passed = [];
+  int trials = 10000;
+  String _resultText = "";
 
   GoitaHand getGoitaHand(idx) {
     var hand = game.yama.skip(idx * 8).take(8).toList();
@@ -60,7 +63,8 @@ class RandomGoitaState extends State<RandomGoita> {
             style: _biggerFont,
           ),
           trailing: FloatingActionButton(
-              heroTag: "addFilterBtn" + i.toString(), /* 個別のidが必要 */
+              heroTag: "addFilterBtn" + i.toString(),
+              /* 個別のidが必要 */
               onPressed: () async {
                 appendFilter(i);
               },
@@ -83,29 +87,35 @@ class RandomGoitaState extends State<RandomGoita> {
     });
   }
 
+  simulate() {
+    var list = Iterable.generate(trials, (i) => Game());
+    _filters.forEach((filter) => list = list.where(filter.testFunc));
+    return list.toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: Text('Goita Simulator')),
         body: Column(children: [
+          new Expanded(child: buildListView()),
+          Container(
+            child: Text(_resultText),
+          ),
           ...List.generate(4, (idx) {
             /* ... は Dart 2.3 で導入された List を展開する記法 */
             return getGoitaHand(idx);
           }),
-          new Expanded(child: buildListView()),
-          /*
           FlatButton(
             onPressed: () async {
-              appendFilter(-1);
-            },
-            child: Text(
-              "Add Filter",
-            ),
-          ),
-          */
-          FlatButton(
-            onPressed: () {
-              setState(() {});
+              final now = DateTime.now();
+              final results = await simulate();
+              final time = DateTime.now().difference(now);
+              setState(() {
+                _passed = results;
+                _resultText =
+                    "${_passed.length} passed / tried ${trials} (${time.inSeconds} sec.)";
+              });
             },
             child: Text(
               "Simulate",
