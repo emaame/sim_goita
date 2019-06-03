@@ -26,36 +26,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class FilterListView extends StatefulWidget {
-  @override
-  FilterListViewState createState() => FilterListViewState();
-}
-class FilterListViewState extends State<FilterListView> {
-  final _filters = <Filter>[];
-  final _biggerFont = const TextStyle(fontSize: 18.0);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-        padding: const EdgeInsets.all(16.0),
-        itemBuilder: (context, i) {
-          if (i.isOdd) return Divider();
-
-          final index = i ~/ 2;
-          return _buildRow(_filters[index]);
-        });
-  }
-
-  Widget _buildRow(Filter filter) {
-    return ListTile(
-      title: Text(
-        filter.toString(),
-        style: _biggerFont,
-      ),
-    );
-  }
-}
-
 class RandomGoita extends StatefulWidget {
   @override
   RandomGoitaState createState() => RandomGoitaState();
@@ -72,25 +42,45 @@ class RandomGoitaState extends State<RandomGoita> {
     return GoitaHand(hand: hand);
   }
 
-  Widget buildListView(BuildContext context) {
-    return ListView.builder(
-      scrollDirection: Axis.vertical,
-      shrinkWrap: true,
+  Widget buildListView() {
+    var count = _filters.length + 1;
+    var list = List.from(_filters);
+    list.add(null);
+    return ListView.separated(
       padding: const EdgeInsets.all(16.0),
+      itemCount: count,
       itemBuilder: (context, i) {
-        if (i.isOdd) return Divider();
-
-        final index = i ~/ 2;
-        if (_filters.length <= index) {
-          return null;
+        var text = "";
+        if (list[i] is Filter) {
+          text = list[i].toString();
         }
         return ListTile(
           title: Text(
-            _filters[index].toString(),
+            text,
             style: _biggerFont,
           ),
+          trailing: FloatingActionButton(
+              heroTag: "addFilterBtn" + i.toString(), /* 個別のidが必要 */
+              onPressed: () async {
+                appendFilter(i);
+              },
+              child: Column(children: [Icon(Icons.add), Text("条件")])),
         );
-      });
+      },
+      separatorBuilder: (BuildContext context, int index) => const Divider(),
+    );
+  }
+
+  appendFilter(index) async {
+    final result = await Navigator.pushNamed(context, FilterEditor.routeName);
+    Filter filter = result as Filter;
+    setState(() {
+      if (index < 0 || index >= _filters.length) {
+        _filters.add(filter);
+      } else {
+        _filters.insert(index, filter);
+      }
+    });
   }
 
   @override
@@ -98,26 +88,30 @@ class RandomGoitaState extends State<RandomGoita> {
     return Scaffold(
         appBar: AppBar(title: Text('Goita Simulator')),
         body: Column(children: [
-          ...List.generate(4, (idx) { /* ... は Dart 2.3 で導入された List を展開する記法 */
-              return getGoitaHand(idx);
+          ...List.generate(4, (idx) {
+            /* ... は Dart 2.3 で導入された List を展開する記法 */
+            return getGoitaHand(idx);
           }),
-          new Expanded(
-            child: buildListView(context)
-          ),
+          new Expanded(child: buildListView()),
+          /*
           FlatButton(
             onPressed: () async {
-              final result = await Navigator.pushNamed(
-                context,
-                FilterEditor.routeName
-              );
-              setState(() {
-                _filters.add(result as Filter);
-              });
+              appendFilter(-1);
             },
             child: Text(
               "Add Filter",
             ),
           ),
+          */
+          FlatButton(
+            onPressed: () {
+              setState(() {});
+            },
+            child: Text(
+              "Simulate",
+            ),
+          ),
+          /*
           FlatButton(
             onPressed: () {
               setState(() {
@@ -127,7 +121,7 @@ class RandomGoitaState extends State<RandomGoita> {
             child: Text(
               "Reset",
             ),
-          )
+          )*/
         ]));
   }
 }

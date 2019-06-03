@@ -63,20 +63,20 @@ enum CondType { LESS, LESS_THAN, EQUAL, MORE_THAN, MORE }
 enum CondTarget { P1, P2, P3, P4, PAIR_FRIEND, PAIR_ENEMY, WHOLE }
 
 const CondTypeToName = {
-  CondType.LESS: "未満 (<)",
-  CondType.LESS_THAN: "以下 (<=)",
+  CondType.LESS: "未満",
+  CondType.LESS_THAN: "以下",
   CondType.EQUAL: "に等しく",
-  CondType.MORE_THAN: "以上 (>=)",
-  CondType.MORE: "より多い (>)",
+  CondType.MORE_THAN: "以上",
+  CondType.MORE: "より多く",
 };
 const CondTargetToName = {
-  CondTarget.P1: "自分 が ",
-  CondTarget.P2: "下家 が ",
-  CondTarget.P3: "相方 が ",
-  CondTarget.P4: "上家 が ",
-  CondTarget.PAIR_FRIEND: "味方ペア が ",
-  CondTarget.PAIR_ENEMY: "敵ペア が ",
-  CondTarget.WHOLE: "全体 で ",
+  CondTarget.P1: "自分",
+  CondTarget.P2: "下家",
+  CondTarget.P3: "相方",
+  CondTarget.P4: "上家",
+  CondTarget.PAIR_FRIEND: "味方ペア",
+  CondTarget.PAIR_ENEMY: "敵ペア",
+  CondTarget.WHOLE: "全体",
 };
 
 typedef CondTypeFunc CondTypeFuncGenerator(int _n);
@@ -152,10 +152,11 @@ class Filter {
   String toString() {
     var buf = new StringBuffer();
     buf.write(CondTargetToName[_target]);
+    buf.write("が'");
     buf.write(KomaToName[_koma]);
-    buf.write(" を ");
+    buf.write("'を");
     buf.write(_n.toString());
-    buf.write(" 枚 ");
+    buf.write("枚");
     buf.write(CondTypeToName[_type]);
     buf.write("所持");
     return buf.toString();

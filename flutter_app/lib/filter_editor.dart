@@ -26,7 +26,7 @@ const CondTargets = [
   CondTarget.P2,
   CondTarget.P3,
   CondTarget.P4,
-  CondTarget.PAIR_ENEMY,
+  CondTarget.PAIR_FRIEND,
   CondTarget.PAIR_ENEMY,
   CondTarget.WHOLE
 ];
@@ -101,12 +101,13 @@ class FilterEditorState extends State<FilterEditor> {
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Row(children: [
+            Row(children:[
               /* ここで無名関数を作らないと不自然なエラーが出ることがある */
               _buildDropdownButton(
                 condTarget,
                 (newT) { setState(() {condTarget = newT;}); },
                 CondTargets, CondTargetToName),
+              Text(" が "),
               _buildDropdownButton(
                 koma,
                 (newK) { setState(() {koma = newK; n = min(n ?? 0, maxN());}); },
@@ -122,6 +123,7 @@ class FilterEditorState extends State<FilterEditor> {
                 (newT) { setState(() {condType = newT;}); },
                 CondTypes,
                 CondTypeToName),
+              Text(" 所持"),
             ]),
             FlatButton(
               onPressed: () {
