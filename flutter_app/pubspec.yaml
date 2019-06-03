@@ -39,18 +39,18 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/fore_shi.png
-    - assets/fore_gon.png
-    - assets/fore_uma.png
-    - assets/fore_gin.png
-    - assets/fore_kin.png
-    - assets/fore_kaku.png
-    - assets/fore_hi.png
-    - assets/fore_ou.png
-    - assets/fore_dama.png
-    - assets/fore_hatena.png
-    - assets/fore.png
-    - assets/back.png
+    - images/fore_shi.png
+    - images/fore_gon.png
+    - images/fore_uma.png
+    - images/fore_gin.png
+    - images/fore_kin.png
+    - images/fore_kaku.png
+    - images/fore_hi.png
+    - images/fore_ou.png
+    - images/fore_dama.png
+    - images/fore_hatena.png
+    - images/fore.png
+    - images/back.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

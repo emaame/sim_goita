@@ -4,18 +4,18 @@ import 'filter_editor.dart';
 import 'screens.dart';
 
 final komaImages = {
-  Koma.SHI: Image.asset('assets/fore_shi.png'),
-  Koma.GON: Image.asset('assets/fore_gon.png'),
-  Koma.UMA: Image.asset('assets/fore_uma.png'),
-  Koma.GIN: Image.asset('assets/fore_gin.png'),
-  Koma.KIN: Image.asset('assets/fore_kin.png'),
-  Koma.KAKU: Image.asset('assets/fore_kaku.png'),
-  Koma.HI: Image.asset('assets/fore_hi.png'),
-  Koma.OU: Image.asset('assets/fore_ou.png'),
-  Koma.GYOKU: Image.asset('assets/fore_dama.png'),
-  Koma.BLANK: Image.asset('assets/fore.png'),
-  Koma.QUESTION: Image.asset('assets/fore_hatena.png'),
-  Koma.BACK: Image.asset('assets/back.png'),
+  Koma.SHI: Image.asset('images/fore_shi.png'),
+  Koma.GON: Image.asset('images/fore_gon.png'),
+  Koma.UMA: Image.asset('images/fore_uma.png'),
+  Koma.GIN: Image.asset('images/fore_gin.png'),
+  Koma.KIN: Image.asset('images/fore_kin.png'),
+  Koma.KAKU: Image.asset('images/fore_kaku.png'),
+  Koma.HI: Image.asset('images/fore_hi.png'),
+  Koma.OU: Image.asset('images/fore_ou.png'),
+  Koma.GYOKU: Image.asset('images/fore_dama.png'),
+  Koma.BLANK: Image.asset('images/fore.png'),
+  Koma.QUESTION: Image.asset('images/fore_hatena.png'),
+  Koma.BACK: Image.asset('images/back.png'),
 };
 
 void main() => runApp(MyApp());
