@@ -1,12 +1,8 @@
-library filter_editor;
-
 import 'package:flutter_web/material.dart';
 import 'dart:math';
 import 'goita.dart';
 
 class FilterEditor extends StatefulWidget {
-  static const routeName = "/edit_filter";
-
   @override
   FilterEditorState createState() => FilterEditorState();
 }
@@ -100,31 +96,38 @@ class FilterEditorState extends State<FilterEditor> {
         ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Row(children:[
-              /* ここで無名関数を作らないと不自然なエラーが出ることがある */
-              _buildDropdownButton(
-                condTarget,
-                (newT) { setState(() {condTarget = newT;}); },
-                CondTargets, CondTargetToName),
-              Text(" が "),
-              _buildDropdownButton(
-                koma,
-                (newK) { setState(() {koma = newK; n = min(n ?? 0, maxN());}); },
-                Komas, KomaToName),
-              Text(" を "),
-              _buildDropdownButton(
-                n,
-                (newN) { setState(() {n = newN;}); },
-                ns, NstoText),
-              Text(" 枚 "),
-              _buildDropdownButton(
-                condType,
-                (newT) { setState(() {condType = newT;}); },
-                CondTypes,
-                CondTypeToName),
-              Text(" 所持"),
-            ]),
+            Card(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children:[
+                  /* ここで無名関数を作らないと不自然なエラーが出ることがある */
+                  _buildDropdownButton(
+                    condTarget,
+                    (newT) { setState(() {condTarget = newT;}); },
+                    CondTargets, CondTargetToName),
+                  Text(" が "),
+                  _buildDropdownButton(
+                    koma,
+                    (newK) { setState(() {koma = newK; n = min(n ?? 0, maxN());}); },
+                    Komas, KomaToName),
+                  Text(" を "),
+                  _buildDropdownButton(
+                    n,
+                    (newN) { setState(() {n = newN;}); },
+                    ns, NstoText),
+                  Text(" 枚 "),
+                  _buildDropdownButton(
+                    condType,
+                    (newT) { setState(() {condType = newT;}); },
+                    CondTypes,
+                    CondTypeToName),
+                  Text(" 所持"),
+                ])
+            )
+            ,
             FlatButton(
               onPressed: () {
                 Navigator.pop(context, Filter(koma, n, condType, condTarget));

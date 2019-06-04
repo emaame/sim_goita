@@ -128,6 +128,10 @@ class Filter {
     _testFunc = generateTestFunction();
   }
 
+  Filter clone() {
+    return Filter(_koma, _n, _type, _target);
+  }
+
   Koma get koma { return _koma; }
   int get n { return _n; }
   CondType get type { return _type; }

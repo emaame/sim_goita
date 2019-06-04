@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'goita.dart';
+import 'routes.dart';
+import 'storage.dart';
 import 'filter_editor.dart';
-import 'screens.dart';
+import 'config_screen.dart';
 
 final komaImages = {
   Koma.SHI: Image.asset('images/fore_shi.png'),
@@ -18,9 +21,32 @@ final komaImages = {
   Koma.BACK: Image.asset('images/back.png'),
 };
 
-void main() => runApp(MyApp());
+void main() async {
+  await Storage.init();
+  runApp(MyApp());
+}
 
-class MainScreen extends MainScreenBase {
+class ComputeParam {
+  int trials;
+  List<Filter> filters;
+  ComputeParam(newTrials, newFilters) {
+    trials = newTrials;
+    filters = newFilters;
+  }
+}
+List<Game> doSimulate(ComputeParam args) {
+  final trials = args.trials;
+  final filters = args.filters;
+  var iter = Iterable.generate(trials, (i) => Game());
+  filters.forEach((filter) => iter = iter.where(filter.testFunc));
+  return iter.toList();
+}
+
+Future<List<Game>> simulate(ComputeParam args) async {
+  return await compute(doSimulate, args);
+}
+
+class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RandomGoita();
@@ -32,10 +58,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: "ごいたシミュレータ",
-      initialRoute: MainScreenBase.routeName,
+      initialRoute: Routes.main,
       routes: {
-        MainScreenBase.routeName: (context) => MainScreen(),
-        FilterEditorBase.routeName: (context) => FilterEditor(),
+        Routes.main: (context) => MainScreen(),
+        Routes.edit_filter: (context) => FilterEditor(),
+        Routes.config: (context) => ConfigScreen(),
       },
     );
   }
@@ -47,14 +74,19 @@ class RandomGoita extends StatefulWidget {
 }
 
 class RandomGoitaState extends State<RandomGoita> {
-  final _biggerFont = const TextStyle(fontSize: 18.0);
+  final _font = const TextStyle(fontSize: 14.0);
 
   List<Filter> _filters = [];
   List<Game> _passed = [];
-  int trials = 1000000;
+  int _trials = 1000000;
   String _resultText = "";
-  Game _sample = null;
+  Game _sample;
   int _index = 0;
+  bool _simulating = false;
+
+  RandomGoitaState() {
+    _trials = Storage.getInt(KEY_TRIALS);
+  }
 
   Widget buildListView() {
     var count = _filters.length + 1;
@@ -71,7 +103,7 @@ class RandomGoitaState extends State<RandomGoita> {
         return ListTile(
           title: Text(
             text,
-            style: _biggerFont,
+            style: _font,
           ),
           trailing: MaterialButton(
               minWidth: 10.0,
@@ -88,8 +120,10 @@ class RandomGoitaState extends State<RandomGoita> {
   }
 
   appendFilter(index) async {
-    final result = await Navigator.pushNamed(context, FilterEditor.routeName);
-    if (result == null) { return; }
+    final result = await Navigator.pushNamed(context, Routes.edit_filter);
+    if (result == null) {
+      return;
+    }
     Filter filter = result as Filter;
     setState(() {
       if (index < 0 || index >= _filters.length) {
@@ -100,20 +134,14 @@ class RandomGoitaState extends State<RandomGoita> {
     });
   }
 
-  simulate() {
-    var list = Iterable.generate(trials, (i) => Game());
-    _filters.forEach((filter) => list = list.where(filter.testFunc));
-    return list.toList();
-  }
-
   bool shouldPrevDisabled() {
     if (_index <= 0) return true;
-    if (_passed.length <= 0) return true;
+    if (_passed.isEmpty) return true;
     return false;
   }
 
   bool shouldNextDisabled() {
-    if (_passed.length <= 0) return true;
+    if (_passed.isEmpty) return true;
     if (_index >= _passed.length - 1) return true;
     return false;
   }
@@ -121,8 +149,26 @@ class RandomGoitaState extends State<RandomGoita> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text('Goita Simulator')),
-        body: Column(children: [
+        appBar: AppBar(title: Text('Goita Simulator'), actions: <Widget>[
+          // action button
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () async {
+              final result = await Navigator.pushNamed(context, Routes.config);
+              if (result == null) {
+                return;
+              }
+              Config conf = result as Config;
+              if (conf == null) {
+                return;
+              }
+              setState(() {
+                _trials = conf.trials;
+              });
+            },
+          ),
+        ]),
+        body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           Expanded(child: buildListView()),
           Row(
             children: <Widget>[
@@ -167,30 +213,32 @@ class RandomGoitaState extends State<RandomGoita> {
             ],
           ),
           Center(child: Text(_resultText)),
-          /*
-          ...List.generate(4, (idx) {
-            /* ... は Dart 2.3 で導入された List を展開する記法 */
-            return getGoitaHand(idx);
-          }),
-          */
           FlatButton(
             onPressed: () async {
               final now = DateTime.now();
-              final results = await simulate();
+              setState(() {
+                _simulating = true;
+              });
+              final args = ComputeParam(_trials, _filters.map((f) => f.clone()).toList());
+              final results = await simulate(args);
               final time = DateTime.now().difference(now);
               setState(() {
+                _simulating = false;
                 _passed = results;
                 _sample = _passed[0];
 
-                final percent = 100.0 * _passed.length / trials;
+                final percent = 100.0 * _passed.length / _trials;
                 _resultText =
-                    "${percent.toStringAsFixed(4)}% -- ${_passed.length} passed / tried $trials (${time.inSeconds} sec.)";
+                    "${percent.toStringAsFixed(4)}% -- ${_passed.length} passed / tried $_trials (${time.inSeconds} sec.)";
               });
             },
             child: Text(
               "Simulate",
             ),
           ),
+          Padding(
+              padding: EdgeInsets.all(8.0),
+              child: LinearProgressIndicator(value: _simulating ? null : 0.0)),
         ]));
   }
 }
