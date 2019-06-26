@@ -161,7 +161,7 @@ class RandomGoitaState extends State<RandomGoita> {
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    final gridHeight = 300.0;
+    final gridHeight = 200.0;
     final itemWidth = (size.width - 60.0) / 8.0;
     final itemHeight = gridHeight / 4.0;
     final gridAspectRatio = (itemWidth / itemHeight);
@@ -211,6 +211,7 @@ class RandomGoitaState extends State<RandomGoita> {
               "Simulate",
             ),
           ),
+          Center(child: Text(_resultText)),
           Row(
             children: <Widget>[
               SizedBox(
@@ -255,7 +256,6 @@ class RandomGoitaState extends State<RandomGoita> {
                   )),
             ],
           ),
-          Center(child: Text(_resultText)),
         ]));
   }
 }
