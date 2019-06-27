@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:html';
 import 'dart:convert';
 import 'dart:typed_data';
@@ -27,24 +26,6 @@ final komaImages = {
 void main() async {
   await Storage.init();
   runApp(MyApp());
-}
-
-class ComputeParam {
-  int trials;
-  Iterable<Filter> filters;
-  ComputeParam(int newTrials, Iterable<Filter> newFilters) {
-    trials = newTrials;
-    filters = newFilters;
-  }
-  Map<String, dynamic> toJson() => {'trials': trials, 'filters': filters};
-}
-
-Future<List<Game>> simulate(ComputeParam args) async {
-  final trials = args.trials;
-  final filters = args.filters;
-  var iter = Iterable.generate(trials, (i) => Game());
-  filters.forEach((filter) => iter = iter.where(filter.testFunc));
-  return iter.toList();
 }
 
 class MainScreen extends StatelessWidget {
@@ -154,14 +135,11 @@ class RandomGoitaState extends State<RandomGoita> {
 
   bool shouldPrevDisabled() {
     if (_index <= 0) return true;
-    //if (_passed.isEmpty) return true;
     if (_passedCount <= 0) return true;
     return false;
   }
 
   bool shouldNextDisabled() {
-    //if (_passed.isEmpty) return true;
-    //if (_index >= _passed.length - 1) return true;
     if (_passedCount <= 0) return true;
     if (_index >= _passedCount - 1) return true;
     return false;
@@ -184,24 +162,6 @@ class RandomGoitaState extends State<RandomGoita> {
       setState(() {
         _simulating = true;
       });
-      final args =
-          ComputeParam(_trials, _filters.map((f) => f.clone()).toList());
-      /*
-    final now = DateTime.now();
-    final results = await simulate(args);
-    final time = DateTime.now().difference(now);
-    print("FW: " + time.toString());
-    setState(() {
-      _simulating = false;
-      _passed = results;
-      _sample = _passed[0];
-
-      final percent = 100.0 * _passed.length / _trials;
-      _resultText =
-          "${percent.toStringAsFixed(4)}% -- ${_passed.length} passed / $_trials tried (${time.inSeconds} sec.)";
-    });
-    */
-
       // WebWorker Version
       final nowWW = DateTime.now();
       final w = Worker("filter.js");
@@ -241,6 +201,15 @@ class RandomGoitaState extends State<RandomGoita> {
     return Scaffold(
         appBar: AppBar(title: Text('Goita Simulator'), actions: <Widget>[
           // action button
+          MaterialButton(
+            minWidth: 10.0,
+            /* minimize button */
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            onPressed: () async {
+              window.location.replace('https://sim-goita-old.web.app/');
+            },
+            child:
+                Column(children: [Icon(Icons.arrow_back), Text("旧版", style: _font)])),
           IconButton(
             icon: Icon(Icons.settings),
             onPressed: () async {
