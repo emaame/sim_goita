@@ -1,5 +1,17 @@
 {
   "projects": {
     "default": "sim-goita"
+  },
+  "targets": {
+    "sim-goita": {
+      "hosting": {
+        "old": [
+          "sim-goita-old"
+        ],
+        "head": [
+          "sim-goita"
+        ]
+      }
+    }
   }
 }

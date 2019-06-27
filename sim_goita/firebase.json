@@ -1,10 +1,24 @@
 {
-  "hosting": {
-    "public": "build",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ]
-  }
+  "hosting": [
+    {
+      "target": "old",
+      "public": "old_build",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/packages/*",
+        "**/node_modules/**"
+      ]
+    },
+    {
+      "target": "head",
+      "public": "build",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/packages/*",
+        "**/node_modules/**"
+      ]
+    }
+  ]
 }
