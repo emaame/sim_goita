@@ -8,7 +8,7 @@ const DEFAULT_CONFIG = {
 };
 
 class Storage {
-  static init() async {
+  static void init() async {
   }
   static int getInt(String key) {
     final db = window.localStorage;
@@ -20,7 +20,7 @@ class Storage {
     }
     return DEFAULT_CONFIG[key];
   }
-  static setInt(String key, int value) {
+  static void setInt(String key, int value) {
     final db = window.localStorage;
     db[key] = value.toString();
   }

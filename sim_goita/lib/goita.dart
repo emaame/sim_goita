@@ -30,7 +30,7 @@ const KomaToName = {
   Koma.QUESTION: "？",
 };
 
-String komalistToString(komas) {
+String komalistToString(Iterable<Koma> komas) {
   return komas.map((koma) {
     return KomaToName[koma];
   }).join(",");
@@ -81,23 +81,23 @@ const CondTargetToName = {
 
 typedef CondTypeFunc CondTypeFuncGenerator(int _n);
 typedef bool CondTypeFunc(int n);
-CondTypeFunc genLess(_n) {
+CondTypeFunc genLess(int _n) {
   return (n) => n < _n;
 }
 
-CondTypeFunc genLessThan(_n) {
+CondTypeFunc genLessThan(int _n) {
   return (n) => n <= _n;
 }
 
-CondTypeFunc genEqual(_n) {
+CondTypeFunc genEqual(int _n) {
   return (n) => n == _n;
 }
 
-CondTypeFunc genMoreThan(_n) {
+CondTypeFunc genMoreThan(int _n) {
   return (n) => n >= _n;
 }
 
-CondTypeFunc genMore(_n) {
+CondTypeFunc genMore(int _n) {
   return (n) => n > _n;
 }
 
@@ -156,7 +156,7 @@ class Filter {
   CondTarget _target;
   TestFunction _testFunc;
 
-  Filter(koma, int n, CondType type, CondTarget target) {
+  Filter(Koma koma, int n, CondType type, CondTarget target) {
     _koma = koma;
     _n = n;
     _type = type;
@@ -168,7 +168,7 @@ class Filter {
   Filter clone() {
     return Filter(_koma, _n, _type, _target);
   }
-  Map<String, dynamic> toJson() => {
+  Map<String, int> toJson() => {
     'koma': _koma.index,
     'n': _n,
     'type': _type.index,
@@ -195,7 +195,7 @@ class Filter {
     return _testFunc;
   }
 
-  generateTestFunction() {
+  TestFunction generateTestFunction() {
     var getKomaListFunc = CondTargetFuncs[_target];
     var compareFunc = CondTypeFuncGenerators[_type](_n);
     return (Game game) {

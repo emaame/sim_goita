@@ -4,7 +4,7 @@
 import 'package:flutter_web_ui/ui.dart' as ui;
 import 'package:sim_goita/main.dart' as app;
 
-main() async {
+void main() async {
   await ui.webOnlyInitializePlatform();
   app.main();
 }

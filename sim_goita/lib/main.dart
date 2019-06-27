@@ -72,7 +72,7 @@ class RandomGoitaState extends State<RandomGoita> {
     _trials = Storage.getInt(KEY_TRIALS);
   }
 
-  ListTile _buildListTile(item, index) {
+  ListTile _buildListTile(Filter item, int index) {
     final text = (item is Filter) ? item.toString() : "";
     return ListTile(
         title: Text(
@@ -83,7 +83,7 @@ class RandomGoitaState extends State<RandomGoita> {
             minWidth: 10.0,
             /* minimize button */
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            onPressed: () async {
+            onPressed: () {
               appendFilter(index);
             },
             child:
@@ -92,7 +92,7 @@ class RandomGoitaState extends State<RandomGoita> {
 
   Widget buildListView() {
     var count = _filters.length + 1;
-    var list = List.from(_filters);
+    var list = List<Filter>.from(_filters);
     list.add(null);
     return ListView.separated(
         padding: const EdgeInsets.all(16.0),
@@ -118,7 +118,7 @@ class RandomGoitaState extends State<RandomGoita> {
         });
   }
 
-  appendFilter(index) async {
+  Future<void> appendFilter(int index) async {
     final result = await Navigator.pushNamed(context, Routes.edit_filter);
     if (result == null) {
       return;
@@ -145,7 +145,7 @@ class RandomGoitaState extends State<RandomGoita> {
     return false;
   }
 
-  Game convertInt8ListToGame(Int8List sublist) {
+  Game convertInt8ListToGame(List<int> sublist) {
     final List<Koma> yama = List<Koma>(32);
     for (int offset = 0; offset < 32; offset += 8) {
       final hand = sublist.sublist(offset, offset + 8);
@@ -157,7 +157,7 @@ class RandomGoitaState extends State<RandomGoita> {
     return Game.yama(yama);
   }
 
-  Function simulateionPressed() {
+  void Function() simulateionPressed() {
     return () {
       setState(() {
         _simulating = true;
@@ -168,11 +168,12 @@ class RandomGoitaState extends State<RandomGoita> {
       w.onMessage.listen((msg) {
         //print(msg.toString());
         final timeWW = DateTime.now().difference(nowWW);
-        print(msg.data);
-        final passedCount = msg.data["passedCount"];
+        //print(msg.data);
+        final passedCount = msg.data["passedCount"] as int;
         final samples = msg.data["samples"] as ByteBuffer;
-        print("WW: " + timeWW.toString());
+        //print("WW: " + timeWW.toString());
         setState(() {
+          _index = 0;
           _simulating = false;
           _passedCount = passedCount;
           _samples = samples.asInt8List();
@@ -184,7 +185,7 @@ class RandomGoitaState extends State<RandomGoita> {
 
           final percent = 100.0 * _passedCount / _trials;
           _resultText =
-              "${percent.toStringAsFixed(4)}% -- ${_passedCount} passed / $_trials tried (${timeWW.inSeconds} sec.)";
+              "${percent.toStringAsFixed(4)}% -- ${_passedCount} passed / $_trials tried (${timeWW.inMilliseconds / 1000} sec.)";
         });
       });
       w.postMessage(jsonEncode({"trials": _trials, "filters": _filters}));
@@ -290,7 +291,7 @@ class RandomGoitaState extends State<RandomGoita> {
 
 class GoitaHand extends StatefulWidget {
   GoitaHand({Key key, this.hand}) : super(key: key);
-  final List hand;
+  final List<Koma> hand;
   @override
   GoitaHandState createState() => GoitaHandState();
 }

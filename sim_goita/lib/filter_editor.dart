@@ -60,7 +60,7 @@ class FilterEditorState extends State<FilterEditor> {
     n = 1;
   }
 
-  _buildDropdownButton<_T>(value, onChanged, list, nameDict) {
+  DropdownButton<_T> _buildDropdownButton<_T>(_T value, Function(_T) onChanged, Iterable<_T> list, Map<_T, String> nameDict) {
     return DropdownButton<_T>(
       value: value,
       onChanged: onChanged,
@@ -72,7 +72,7 @@ class FilterEditorState extends State<FilterEditor> {
       }).toList(),
     );
   }
-  maxN() {
+  int maxN() {
     switch(koma) {
       case Koma.SHI:
         return 10;
@@ -106,22 +106,22 @@ class FilterEditorState extends State<FilterEditor> {
                   /* ここで無名関数を作らないと不自然なエラーが出ることがある */
                   _buildDropdownButton(
                     condTarget,
-                    (newT) { setState(() {condTarget = newT;}); },
+                    (CondTarget newT) { setState(() {condTarget = newT;}); },
                     CondTargets, CondTargetToName),
                   Text(" が "),
                   _buildDropdownButton(
                     koma,
-                    (newK) { setState(() {koma = newK; n = min(n ?? 0, maxN());}); },
+                    (Koma newK) { setState(() {koma = newK; n = min(n ?? 0, maxN());}); },
                     Komas, KomaToName),
                   Text(" を "),
                   _buildDropdownButton(
                     n,
-                    (newN) { setState(() {n = newN;}); },
+                    (int newN) { setState(() {n = newN;}); },
                     ns, NstoText),
                   Text(" 枚 "),
                   _buildDropdownButton(
                     condType,
-                    (newT) { setState(() {condType = newT;}); },
+                    (CondType newT) { setState(() {condType = newT;}); },
                     CondTypes,
                     CondTypeToName),
                   Text(" 所持"),
