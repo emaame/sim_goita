@@ -23,10 +23,7 @@ initYama.fill(HI, 26, 28);
 initYama.fill(KAKU, 28, 30);
 initYama.fill(OU, 30, 32);
 
-self.addEventListener('message', function (e) {
-  const param = JSON.parse(e.data);
-  const trials = param.trials;
-  const filters = param.filters;
+function makeTestFunc(filters) {
   var code = "";
   for (var filter of filters) {
     code += "{";
@@ -55,29 +52,29 @@ self.addEventListener('message', function (e) {
   }
   code += "return true;";
   //console.log(code);
-  const testFunc = Function("yama", code);
-  var samples = [];
+  return Function("yama", code);
+}
+
+self.addEventListener('message', function (e) {
+  const param = JSON.parse(e.data);
+  const trials = param.trials;
+  const filters = param.filters;
+  const testFunc = makeTestFunc(filters);
+  const result = new Uint8Array(100 * 32);
   var passedCount = 0;
+  var offset = 0;
   const yama = Array.from(initYama);
   for (var i = 0; i < trials; ++i) {
     yama.shuffle();
-    const b = testFunc(yama);
-    if (b) {
+    if (testFunc(yama)) {
       ++passedCount;
-      if (samples.length < 100) {
-        samples.push(Array.from(yama));
+      if (passedCount < 100) {
+        for (var j = 0; j < 32; ++j) {
+          result[offset + j] = yama[j];
+        }
+        offset += 32
       }
     }
-  }
-
-  const result = new Uint8Array(samples.length * 32);
-  var offset = 0;
-  for (var i = 0; i < samples.length; ++i) {
-    const yama = samples[i];
-    for (var j = 0; j < 32; ++j) {
-      result[offset + j] = yama[j];
-    }
-    offset += 32;
   }
   self.postMessage({ passedCount: passedCount, samples: result.buffer }, [result.buffer]);
 }, false);

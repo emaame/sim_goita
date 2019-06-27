@@ -166,22 +166,17 @@ class RandomGoitaState extends State<RandomGoita> {
       final nowWW = DateTime.now();
       final w = Worker("filter.js");
       w.onMessage.listen((msg) {
-        //print(msg.toString());
         final timeWW = DateTime.now().difference(nowWW);
-        //print(msg.data);
         final passedCount = msg.data["passedCount"] as int;
         final samples = msg.data["samples"] as ByteBuffer;
-        //print("WW: " + timeWW.toString());
         setState(() {
           _index = 0;
           _simulating = false;
           _passedCount = passedCount;
           _samples = samples.asInt8List();
-          if (_passedCount == 0) {
-            _sample = null;
-          } else {
-            _sample = convertInt8ListToGame(_samples.sublist(0, 32));
-          }
+          _sample = (_passedCount == 0)
+              ? null
+              : convertInt8ListToGame(_samples.sublist(0, 32));
 
           final percent = 100.0 * _passedCount / _trials;
           _resultText =
@@ -203,14 +198,16 @@ class RandomGoitaState extends State<RandomGoita> {
         appBar: AppBar(title: Text('Goita Simulator'), actions: <Widget>[
           // action button
           MaterialButton(
-            minWidth: 10.0,
-            /* minimize button */
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            onPressed: () async {
-              window.location.replace('https://sim-goita-old.web.app/');
-            },
-            child:
-                Column(children: [Icon(Icons.arrow_back), Text("旧版", style: _font)])),
+              minWidth: 10.0,
+              /* minimize button */
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              onPressed: () async {
+                window.location.replace('https://sim-goita-old.web.app/');
+              },
+              child: Column(children: [
+                Icon(Icons.arrow_back),
+                Text("旧版", style: _font)
+              ])),
           IconButton(
             icon: Icon(Icons.settings),
             onPressed: () async {
