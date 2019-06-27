@@ -1,6 +1,5 @@
 library storage;
 import 'dart:html';
-import 'package:flutter_web/material.dart';
 
 const KEY_TRIALS = "trials";
 
