@@ -51,6 +51,7 @@ class Game {
     yama = List.from(initYama);
     yama.shuffle(); // destructive
   }
+  Game.yama(this.yama);
 
   @override
   String toString() {
@@ -80,11 +81,26 @@ const CondTargetToName = {
 
 typedef CondTypeFunc CondTypeFuncGenerator(int _n);
 typedef bool CondTypeFunc(int n);
-CondTypeFunc genLess(_n) { return (n) => n < _n; }
-CondTypeFunc genLessThan(_n) { return (n) => n <= _n; }
-CondTypeFunc genEqual(_n) { return (n) => n == _n; }
-CondTypeFunc genMoreThan(_n) { return (n) => n >= _n; }
-CondTypeFunc genMore(_n) { return (n) => n > _n; }
+CondTypeFunc genLess(_n) {
+  return (n) => n < _n;
+}
+
+CondTypeFunc genLessThan(_n) {
+  return (n) => n <= _n;
+}
+
+CondTypeFunc genEqual(_n) {
+  return (n) => n == _n;
+}
+
+CondTypeFunc genMoreThan(_n) {
+  return (n) => n >= _n;
+}
+
+CondTypeFunc genMore(_n) {
+  return (n) => n > _n;
+}
+
 const Map<CondType, CondTypeFuncGenerator> CondTypeFuncGenerators = {
   CondType.LESS: genLess,
   CondType.LESS_THAN: genLessThan,
@@ -94,13 +110,34 @@ const Map<CondType, CondTypeFuncGenerator> CondTypeFuncGenerators = {
 };
 
 typedef List<Koma> CondTargetFunc(Game game);
-List<Koma> getP1(Game game) { return game.yama.sublist( 0,  8); }
-List<Koma> getP2(Game game) { return game.yama.sublist( 8, 16); }
-List<Koma> getP3(Game game) { return game.yama.sublist(16, 24); }
-List<Koma> getP4(Game game) { return game.yama.sublist(24, 32); }
-List<Koma> getPAIRFRIEND(Game game) { return game.yama.sublist(0,  8) + game.yama.sublist(16, 24); }
-List<Koma> getPAIRENEMY(Game game)  { return game.yama.sublist(8, 16) + game.yama.sublist(24, 32); }
-List<Koma> getWHOLE(Game game)  { return game.yama; }
+List<Koma> getP1(Game game) {
+  return game.yama.sublist(0, 8);
+}
+
+List<Koma> getP2(Game game) {
+  return game.yama.sublist(8, 16);
+}
+
+List<Koma> getP3(Game game) {
+  return game.yama.sublist(16, 24);
+}
+
+List<Koma> getP4(Game game) {
+  return game.yama.sublist(24, 32);
+}
+
+List<Koma> getPAIRFRIEND(Game game) {
+  return game.yama.sublist(0, 8) + game.yama.sublist(16, 24);
+}
+
+List<Koma> getPAIRENEMY(Game game) {
+  return game.yama.sublist(8, 16) + game.yama.sublist(24, 32);
+}
+
+List<Koma> getWHOLE(Game game) {
+  return game.yama;
+}
+
 const Map<CondTarget, CondTargetFunc> CondTargetFuncs = {
   CondTarget.P1: getP1,
   CondTarget.P2: getP2,
@@ -131,20 +168,40 @@ class Filter {
   Filter clone() {
     return Filter(_koma, _n, _type, _target);
   }
+  Map<String, dynamic> toJson() => {
+    'koma': _koma.index,
+    'n': _n,
+    'type': _type.index,
+    'target': _target.index,
+  };
 
-  Koma get koma { return _koma; }
-  int get n { return _n; }
-  CondType get type { return _type; }
-  CondTarget get target { return _target; }
+  Koma get koma {
+    return _koma;
+  }
 
-  TestFunction get testFunc { return _testFunc; }
+  int get n {
+    return _n;
+  }
+
+  CondType get type {
+    return _type;
+  }
+
+  CondTarget get target {
+    return _target;
+  }
+
+  TestFunction get testFunc {
+    return _testFunc;
+  }
 
   generateTestFunction() {
     var getKomaListFunc = CondTargetFuncs[_target];
     var compareFunc = CondTypeFuncGenerators[_type](_n);
     return (Game game) {
       final komaList = getKomaListFunc(game);
-      final int n = komaList.fold(0, (prev, koma) => prev + ((koma == _koma) ? 1 : 0));
+      final int n =
+          komaList.fold(0, (prev, koma) => prev + ((koma == _koma) ? 1 : 0));
       return compareFunc(n);
     };
   }
