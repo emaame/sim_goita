@@ -55,7 +55,7 @@ class ConfigScreenState extends State<ConfigScreen> {
               Padding(
                   padding: EdgeInsets.all(20.0),
                   child: createNumericTextField(
-                      workersController, "並列実行数", "並列に動かすスレッド数（CPUの論理コア数を推奨）")),
+                      workersController, "並列実行数", "並列に動かすスレッド数（CPUの物理コア数を推奨）")),
               FlatButton(
                 onPressed: () {
                   final trials = int.tryParse(trialsController.text) ??

@@ -7,5 +7,7 @@ targets:
         - web/**.dart
         options:
           dart2js_args:
-            #- --no-source-maps
-            #- -O4
+            - --show-package-warnings
+            #- --no-minify
+            - --no-source-maps
+            - -O4

@@ -8,6 +8,9 @@
         "old": [
           "sim-goita-old"
         ],
+        "test": [
+          "sim-goita-test"
+        ],
         "head": [
           "sim-goita"
         ]

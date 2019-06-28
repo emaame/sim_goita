@@ -6,17 +6,27 @@
       "ignore": [
         "firebase.json",
         "**/.*",
-        "**/packages/*",
+        "**/packages/**",
         "**/node_modules/**"
       ]
     },
     {
       "target": "head",
+      "public": "production",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/packages/**",
+        "**/node_modules/**"
+      ]
+    },
+    {
+      "target": "test",
       "public": "build",
       "ignore": [
         "firebase.json",
         "**/.*",
-        "**/packages/*",
+        "**/packages/**",
         "**/node_modules/**"
       ]
     }

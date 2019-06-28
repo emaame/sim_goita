@@ -74,7 +74,9 @@ class RandomGoitaState extends State<RandomGoita> {
     _workers = Storage.getInt(KEY_WORKERS);
   }
 
-  Game get sample => _index >= _samples.length ? null : _samples[_index];
+  Game get sample => (_index == null)
+      ? null
+      : _index >= _samples.length ? null : _samples[_index];
 
   ListTile _buildListTile(Filter item, int index) {
     final text = (item is Filter) ? item.toString() : "";
@@ -206,13 +208,12 @@ class RandomGoitaState extends State<RandomGoita> {
             _passedCount += passedCount;
 
             final lst = (data["samples"] as ByteBuffer).asInt8List();
-            final int len = min(lst.length, passedCount*32);
-            for (int offset = 0; offset < len; offset+=32) {
+            final int len = min(lst.length, passedCount * 32);
+            for (int offset = 0; offset < len; offset += 32) {
               final Game game =
                   convertInt8ListToGame(lst.sublist(offset, offset + 32));
               _samples.add(game);
             }
-            print(_samples.length);
           }
           final timeWW = DateTime.now().difference(nowWW);
           final percent = 100.0 * _passedCount / _trials;
@@ -258,6 +259,7 @@ class RandomGoitaState extends State<RandomGoita> {
               }
               setState(() {
                 _trials = conf.trials;
+                _workers = conf.workers;
               });
             },
           ),
