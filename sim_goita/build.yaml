@@ -8,4 +8,4 @@ targets:
         options:
           dart2js_args:
             #- --no-source-maps
-            - -O4
+            #- -O4

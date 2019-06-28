@@ -2,9 +2,12 @@ library storage;
 import 'dart:html';
 
 const KEY_TRIALS = "trials";
+const KEY_WORKERS = "workers";
+final int HWConcurrency = window.navigator.hardwareConcurrency;
 
-const DEFAULT_CONFIG = {
-  KEY_TRIALS: 1000000
+final Map<String, int> DEFAULT_CONFIG = {
+  KEY_TRIALS: 1000000,
+  KEY_WORKERS: (HWConcurrency > 0) ? HWConcurrency : 4
 };
 
 class Storage {

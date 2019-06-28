@@ -1,6 +1,8 @@
 import 'dart:html';
 import 'dart:convert';
 import 'dart:typed_data';
+import 'dart:async';
+import 'dart:math';
 import 'package:flutter_web/material.dart';
 import 'goita.dart';
 import 'routes.dart';
@@ -59,18 +61,20 @@ class RandomGoitaState extends State<RandomGoita> {
   final _font = const TextStyle(fontSize: 14.0);
 
   List<Filter> _filters = [];
-  //List<Game> _passed = [];
   int _passedCount = 0;
-  Int8List _samples = Int8List(0);
+  var _samples = List<Game>(0);
   int _trials = 1000000;
+  int _workers = 0;
   String _resultText = "";
-  Game _sample;
   int _index = 0;
   bool _simulating = false;
 
   RandomGoitaState() {
     _trials = Storage.getInt(KEY_TRIALS);
+    _workers = Storage.getInt(KEY_WORKERS);
   }
+
+  Game get sample => _index >= _samples.length ? null : _samples[_index];
 
   ListTile _buildListTile(Filter item, int index) {
     final text = (item is Filter) ? item.toString() : "";
@@ -157,33 +161,66 @@ class RandomGoitaState extends State<RandomGoita> {
     return Game.yama(yama);
   }
 
+  Future<dynamic> invokeWorker(int trials, int samplesPerWorker) {
+    var completer = new Completer<dynamic>();
+
+    final w = Worker("filter.js");
+    w.onMessage.listen((msg) {
+      completer.complete(msg.data);
+    });
+    w.postMessage(jsonEncode(
+        {"trials": trials, "filters": _filters, "samples": samplesPerWorker}));
+
+    return completer.future;
+  }
+
   void Function() simulateionPressed() {
     return () {
       setState(() {
         _simulating = true;
+        _passedCount = 0;
       });
       // WebWorker Version
       final nowWW = DateTime.now();
-      final w = Worker("filter.js");
-      w.onMessage.listen((msg) {
-        final timeWW = DateTime.now().difference(nowWW);
-        final passedCount = msg.data["passedCount"] as int;
-        final samples = msg.data["samples"] as ByteBuffer;
-        setState(() {
-          _index = 0;
-          _simulating = false;
-          _passedCount = passedCount;
-          _samples = samples.asInt8List();
-          _sample = (_passedCount == 0)
-              ? null
-              : convertInt8ListToGame(_samples.sublist(0, 32));
 
+      int restTrials = _trials;
+      int restSamples = 100;
+      int trialsPerWorker = restTrials ~/ _workers;
+      int samplesPerWorker = restSamples ~/ _workers;
+      var workers = List<Future<dynamic>>(_workers);
+      for (int i = 0; i < _workers; ++i) {
+        final trials = (i == _workers - 1) ? restTrials : trialsPerWorker;
+        final samples = (i == _workers - 1) ? restSamples : samplesPerWorker;
+        restTrials -= trials;
+        restSamples -= samples;
+        workers[i] = invokeWorker(trials, samples);
+      }
+
+      Future.wait<dynamic>(workers).then((results) {
+        setState(() {
+          _passedCount = 0;
+          _samples = [];
+          for (int i = 0; i < _workers; ++i) {
+            final dynamic data = results[i];
+            final passedCount = data["passedCount"] as int;
+            _passedCount += passedCount;
+
+            final lst = (data["samples"] as ByteBuffer).asInt8List();
+            final int len = min(lst.length, passedCount*32);
+            for (int offset = 0; offset < len; offset+=32) {
+              final Game game =
+                  convertInt8ListToGame(lst.sublist(offset, offset + 32));
+              _samples.add(game);
+            }
+            print(_samples.length);
+          }
+          final timeWW = DateTime.now().difference(nowWW);
           final percent = 100.0 * _passedCount / _trials;
+          _index = 0;
           _resultText =
               "${percent.toStringAsFixed(4)}% -- ${_passedCount} passed / $_trials tried (${timeWW.inMilliseconds / 1000} sec.)";
         });
       });
-      w.postMessage(jsonEncode({"trials": _trials, "filters": _filters}));
     };
   }
 
@@ -244,9 +281,6 @@ class RandomGoitaState extends State<RandomGoita> {
                         : () {
                             setState(() {
                               _index--;
-                              final offset = _index * 32;
-                              _sample = convertInt8ListToGame(
-                                  _samples.sublist(offset, offset + 32));
                             });
                           },
                     icon: Icon(Icons.arrow_left),
@@ -260,10 +294,8 @@ class RandomGoitaState extends State<RandomGoita> {
                       crossAxisSpacing: 10.0,
                       crossAxisCount: 8,
                       childAspectRatio: gridAspectRatio,
-                      children: (_sample != null)
-                          ? _sample.yama
-                              .map((koma) => komaImages[koma])
-                              .toList()
+                      children: (sample != null)
+                          ? sample.yama.map((koma) => komaImages[koma]).toList()
                           : List.generate(32, (i) => komaImages[Koma.BLANK]))),
               SizedBox(
                   width: 30.0,
@@ -273,9 +305,6 @@ class RandomGoitaState extends State<RandomGoita> {
                         : () {
                             setState(() {
                               _index++;
-                              final offset = _index * 32;
-                              _sample = convertInt8ListToGame(
-                                  _samples.sublist(offset, offset + 32));
                             });
                           },
                     icon: Icon(Icons.arrow_right),

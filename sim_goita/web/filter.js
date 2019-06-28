@@ -59,21 +59,21 @@ self.addEventListener('message', function (e) {
   const param = JSON.parse(e.data);
   const trials = param.trials;
   const filters = param.filters;
+  const samples = param.samples;
   const testFunc = makeTestFunc(filters);
-  const result = new Uint8Array(100 * 32);
+  const result = new Uint8Array(samples * 32);
   var passedCount = 0;
   var offset = 0;
   const yama = Array.from(initYama);
   for (var i = 0; i < trials; ++i) {
     yama.shuffle();
-    if (testFunc(yama)) {
-      ++passedCount;
-      if (passedCount < 100) {
-        for (var j = 0; j < 32; ++j) {
-          result[offset + j] = yama[j];
-        }
-        offset += 32
+    if (!testFunc(yama)) { continue; }
+    ++passedCount;
+    if (passedCount <= samples) {
+      for (var j = 0; j < 32; ++j) {
+        result[offset + j] = yama[j];
       }
+      offset += 32
     }
   }
   self.postMessage({ passedCount: passedCount, samples: result.buffer }, [result.buffer]);

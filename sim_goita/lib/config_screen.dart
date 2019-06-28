@@ -8,19 +8,34 @@ class ConfigScreen extends StatefulWidget {
 }
 
 class Config {
-  int trials = DEFAULT_CONFIG[KEY_TRIALS];
-  Config(int newTrials) {
-    trials = newTrials;
-  }
+  final int trials;
+  final int workers;
+  Config(this.trials, this.workers);
 }
 
 class ConfigScreenState extends State<ConfigScreen> {
   int _trials;
-  final trialsController = TextEditingController();
+  final TextEditingController trialsController = TextEditingController();
+  int _workers;
+  final TextEditingController workersController = TextEditingController();
 
   ConfigScreenState() {
     _trials = Storage.getInt(KEY_TRIALS);
+    _workers = Storage.getInt(KEY_WORKERS);
     trialsController.text = _trials.toString();
+    workersController.text = _workers.toString();
+  }
+
+  TextField createNumericTextField(
+      TextEditingController controller, String labelText, String hintText) {
+    return TextField(
+      keyboardType: TextInputType.number,
+      inputFormatters: <TextInputFormatter>[
+        WhitelistingTextInputFormatter.digitsOnly
+      ],
+      controller: controller,
+      decoration: InputDecoration(labelText: labelText, hintText: hintText),
+    );
   }
 
   @override
@@ -34,26 +49,23 @@ class ConfigScreenState extends State<ConfigScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Padding(
-                padding: EdgeInsets.all(20.0),
-                child:
-                    // How to create number input field in Flutter?
-                    // @ref https://stackoverflow.com/questions/49577781/how-to-create-number-input-field-in-flutter
-                    TextField(
-                      keyboardType: TextInputType.number,
-                      inputFormatters: <TextInputFormatter>[
-                        WhitelistingTextInputFormatter.digitsOnly
-                      ],
-                      controller: trialsController,
-                      decoration: InputDecoration(
-                          labelText: "試行回数", hintText: "試行回数（100万位を推奨）"
-                      ),
-                    ),
-              ),
+                  padding: EdgeInsets.all(20.0),
+                  child: createNumericTextField(
+                      trialsController, "試行回数", "試行回数（100万位を推奨）")),
+              Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: createNumericTextField(
+                      workersController, "並列実行数", "並列に動かすスレッド数（CPUの論理コア数を推奨）")),
               FlatButton(
                 onPressed: () {
-                  final value = int.tryParse(trialsController.text) ?? DEFAULT_CONFIG[KEY_TRIALS];
-                  Storage.setInt(KEY_TRIALS, value);
-                  Navigator.pop(context, Config(value));
+                  final trials = int.tryParse(trialsController.text) ??
+                      DEFAULT_CONFIG[KEY_TRIALS];
+                  final rawWorkers = int.tryParse(workersController.text) ??
+                      DEFAULT_CONFIG[KEY_WORKERS];
+                  final workers = (rawWorkers <= 0) ? 1 : rawWorkers;
+                  Storage.setInt(KEY_TRIALS, trials);
+                  Storage.setInt(KEY_WORKERS, workers);
+                  Navigator.pop(context, Config(trials, workers));
                 },
                 child: Text(
                   "Apply",
